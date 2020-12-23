@@ -1,0 +1,13 @@
+{
+    "width": 1090,
+    "height": 1080,
+    "filename": "coingeckotoday.png", 
+    "url": "https://www.coingecko.com/en",
+    "selectors": [
+        {
+            "type": "class",
+            "value": "floatThead-wrapper"
+        }
+    ]
+}
+

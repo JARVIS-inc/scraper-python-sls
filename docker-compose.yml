@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  lambda:
+    build: .
+    environment:
+      - PYTHONPATH=/var/task/src:/var/task/lib
+      - PATH=/opt/bin
+      - URL=https://www.cnn.com
+      - SCRAPESHOTBUCKET=dev-scrapeshotbucket
+      - ISDOCKERENV=True
+    volumes:
+      - ./src/:/var/task/src/
+      - ./tmp/:/tmp/

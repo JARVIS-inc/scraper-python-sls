@@ -1,0 +1,58 @@
+service: scraper-python-sls
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: python3.7
+  environment:
+    SCRAPESHOTBUCKET: ${self:custom.scrapeshotbucket}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:PutObjectAcl
+      Resource: "arn:aws:s3:::${self:custom.scrapeshotbucket}/*"
+        
+layers:
+  ChromiumSelenium:
+    path: layer-dir
+    description: The Chromium Layer
+    name: ${opt:stage, self:provider.stage, 'dev'}-ChromiumSelenium
+    compatibleRuntimes:
+                - python3.7
+                - python3.6
+    retain: false
+
+package:
+  exclude:
+    - event.json
+    - chromium.zip 
+    - docker-compose.yml
+    - Dockerfile
+    - Makefile
+    - requirements.txt
+    - tmp/**
+    - README.md
+    - .vscode/**
+    - bin.zip
+
+custom:
+  scrapeshotbucket: ${opt:stage, self:provider.stage, 'dev'}-scrapeshotbucket
+  functionsBasePath: src/
+  
+functions:
+  hello:
+    handler: handler.scrapeshot
+    timeout: 45
+    events:
+      - s3:
+          bucket: ${self:custom.scrapeshotbucket}
+          event: s3:ObjectCreated:*
+    layers:
+      - {Ref: ChromiumSeleniumLambdaLayer}
+
+plugins:
+  - serverless-functions-base-path
+
+#TODO: Increase memory for lambda maybe? 
+#TODO: Sessions storage?
